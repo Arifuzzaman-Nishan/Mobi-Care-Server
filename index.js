@@ -18,64 +18,87 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 client.connect(err => {
-  const serviceCollection = client.db("mobi-care").collection("service");
+    const serviceCollection = client.db("mobi-care").collection("service");
 
-  const orderCollection = client.db("mobi-care").collection("orders");
+    const orderCollection = client.db("mobi-care").collection("orders");
 
-  const reviewCollection = client.db("mobi-care").collection("review");
+    const reviewCollection = client.db("mobi-care").collection("review");
 
-  console.log("connected");
+    console.log("connected");
 
-  app.get('/', (req, res) => {
-    res.send('Hello World!')
-  })
-
-  app.post('/addService',(req,res) => {
-      const serviceData = req.body;
-      serviceCollection.insertOne(serviceData)
-      .then(result => {
-          res.send(result.insertedCount > 0);
-        //   console.log(result);
-      })
-  })
-
-  app.get('/allService',(req,res) => {
-      serviceCollection.find()
-      .toArray((err,documents) => {
-          res.send(documents);
-      })
-  })
-//   
-  app.get('/specificService/:id',(req,res) => {
-    serviceCollection.find({_id: ObjectID(req.params.id)})
-    .toArray((err,documents) => {
-        res.send(documents[0]);
+    app.get('/', (req, res) => {
+        res.send('Hello World!')
     })
-})
 
-app.post('/orders',(req,res) => {
-    console.log(req.body);
-    orderCollection.insertOne(req.body)
-    .then(result => {
-        res.send(result.insertedCount > 0);
+    app.post('/addService', (req, res) => {
+        const serviceData = req.body;
+        serviceCollection.insertOne(serviceData)
+            .then(result => {
+                res.send(result.insertedCount > 0);
+                //   console.log(result);
+            })
     })
-})
 
-    // for order show api
-    app.get('/showOrder', (req, res) => {
-        console.log(req.query.email);
-        orderCollection.find({email: req.query.email})
+    app.get('/allService', (req, res) => {
+        serviceCollection.find()
+            .toArray((err, documents) => {
+                res.send(documents);
+            })
+    })
+    //   
+    app.get('/specificService/:id', (req, res) => {
+        serviceCollection.find({ _id: ObjectID(req.params.id) })
+            .toArray((err, documents) => {
+                res.send(documents[0]);
+            })
+    })
+
+    app.post('/orders', (req, res) => {
+        console.log(req.body);
+        orderCollection.insertOne(req.body)
+            .then(result => {
+                res.send(result.insertedCount > 0);
+            })
+    })
+
+    app.get('/allOrders', (req, res) => {
+        // console.log(req.query.email);
+        orderCollection.find()
             .toArray((err, documents) => {
                 res.send(documents)
             })
     })
 
-    app.post('/review',(req,res) => {
-        reviewCollection.insertOne(req.body)
-        .then(result => {
-            res.send(result.insertedCount > 0);
-        })
+
+    // for order show api
+    app.get('/showOrder', (req, res) => {
+        console.log(req.query.email);
+        orderCollection.find({ email: req.query.email })
+            .toArray((err, documents) => {
+                res.send(documents)
+            })
     })
+
+    app.post('/review', (req, res) => {
+        reviewCollection.insertOne(req.body)
+            .then(result => {
+                res.send(result.insertedCount > 0);
+            })
+    })
+
+    // update
+    app.patch('/update/:id', (req, res) => {
+        console.log(req.body);
+        orderCollection.updateOne({ _id: ObjectID(req.params.id) }, {
+            $set: {
+                status: req.body.status
+            }
+        })
+            .then(result => {
+                res.send(result.modifiedCount > 0)
+            })
+    })
+
 
 });
 
