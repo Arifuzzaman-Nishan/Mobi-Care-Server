@@ -83,10 +83,20 @@ client.connect(err => {
             })
     })
 
+    // send data to review
     app.post('/review', (req, res) => {
         reviewCollection.insertOne(req.body)
             .then(result => {
                 res.send(result.insertedCount > 0);
+            })
+    })
+
+    // get data from review
+    app.get('/showReview', (req, res) => {
+        
+        reviewCollection.find()
+            .toArray((err, documents) => {
+                res.send(documents)
             })
     })
 
@@ -116,10 +126,27 @@ client.connect(err => {
     app.post('/isAdmin', (req, res) => {
         console.log(req.body);
         adminCollection.find({ email: req.body.email })
-        .toArray((err, documents) => {
-            res.send(documents.length > 0)
-        })
+            .toArray((err, documents) => {
+                res.send(documents.length > 0)
+            })
     })
+
+    // delete order
+    app.delete('/orderDelete/:id', (req, res) => {
+        orderCollection.deleteOne({ _id: ObjectID(req.params.id) })
+            .then(result => {
+                res.send(result.deletedCount > 0);
+            })
+    })
+
+    // delete service
+    app.delete('/serviceDelete/:id', (req, res) => {
+        serviceCollection.deleteOne({ _id: ObjectID(req.params.id) })
+            .then(result => {
+                res.send(result.deletedCount > 0);
+            })
+    })
+
 
 
 
