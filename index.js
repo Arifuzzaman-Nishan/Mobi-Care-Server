@@ -24,6 +24,8 @@ client.connect(err => {
 
     const reviewCollection = client.db("mobi-care").collection("review");
 
+    const adminCollection = client.db("mobi-care").collection("addAdmin");
+
     console.log("connected");
 
     app.get('/', (req, res) => {
@@ -32,6 +34,8 @@ client.connect(err => {
 
     app.post('/addService', (req, res) => {
         const serviceData = req.body;
+
+        console.log(serviceData);
         serviceCollection.insertOne(serviceData)
             .then(result => {
                 res.send(result.insertedCount > 0);
@@ -98,6 +102,25 @@ client.connect(err => {
                 res.send(result.modifiedCount > 0)
             })
     })
+
+    //addAdmin
+    app.post('/addAdmin', (req, res) => {
+        console.log(req.body);
+        adminCollection.insertOne(req.body)
+            .then(result => {
+                res.send(result.insertedCount > 0);
+            })
+    })
+
+    //isAdmin
+    app.post('/isAdmin', (req, res) => {
+        console.log(req.body);
+        adminCollection.find({ email: req.body.email })
+        .toArray((err, documents) => {
+            res.send(documents.length > 0)
+        })
+    })
+
 
 
 });
